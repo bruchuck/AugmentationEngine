@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->graphicsView->setRenderHint(QPainter::SmoothPixmapTransform);
 
 
+
     d_newTree = new DialogNewTree(this);
 
     connect(d_newTree,SIGNAL(accepted()),this,SLOT(apply_newTree()));
@@ -56,34 +57,31 @@ void MainWindow::on_actionLoad_Input_File_triggered()
 }
 
 //create Children for node and return the leaf
-QList<AugmentationNode *> MainWindow::createBrothers(AugmentationNode *node, QList<Dialog_Parameters::DialogData> nodeTypes){
+void MainWindow::createBrothers(AugmentationNode *node, QList<Dialog_Parameters::DialogData> nodeTypes, QList<AugmentationNode *> &leafNodes){
 
     LayerData currentLayer = d_newTree->layers.at(nodeTypes.first().layerIndex);
-
     int numBros = cvrand.uniform(currentLayer.brothersMin,currentLayer.brothersMax+1);
 
-    QList<AugmentationNode *> leafs;
+
     int rnd;
     int h = node->height;
     int b = node->brothers;
 
-    qDebug()<< currentLayer.brothersMin << currentLayer.brothersMax << currentLayer.hMin << currentLayer.hMax;
+    //qDebug()<< currentLayer.brothersMin << currentLayer.brothersMax << currentLayer.hMin << currentLayer.hMax;
 
     for(int i = 0; i< numBros; i++){
-
 
         //instantiate a brother
         node->brothers++;
         rnd =cvrand.uniform(0,nodeTypes.size());
         AugmentationNode *newNode = tree.instantiateNode(nodeTypes[rnd].nodeName);
-        //add parameters to the new created node
 
+        //add parameters to the new created node
         qDebug() << nodeTypes[rnd].parameters.size();
         foreach(AugmentationNode::Parameter p, nodeTypes[rnd].parameters){
             qDebug() << p.name;
             newNode->setParameter(p.name,p.value,p.type,p.min,p.max,p.sigma);
         }
-
         QList<Dialog_Parameters::DialogData> updatedNodeType = nodeTypes;
         updatedNodeType.removeAt(rnd);
 
@@ -92,7 +90,7 @@ QList<AugmentationNode *> MainWindow::createBrothers(AugmentationNode *node, QLi
 
         //less than minimum, need to add
         if(h+1 < currentLayer.hMin){
-            createBrothers(newNode,updatedNodeType);
+            createBrothers(newNode,updatedNodeType, leafNodes);
 
         }else{
 
@@ -101,47 +99,47 @@ QList<AugmentationNode *> MainWindow::createBrothers(AugmentationNode *node, QLi
             else
                 rnd = cvrand.uniform(0,2);
 
-            if(rnd == 1 && h+1 < currentLayer.hMax){
-
-                createBrothers(newNode, updatedNodeType);
+            if(rnd == 1 && h+1 < (currentLayer.hMax + currentLayer.priority)){
+                createBrothers(newNode, updatedNodeType, leafNodes);
             }else{
-                leafs << newNode;
-            }
-        }
+                leafNodes << newNode;
+            }}
     }
-
-    return leafs;
 }
 void MainWindow::apply_newTree()
 {
 
+    //clean the scene
     tree.clear();
     scene->clear();
     scene->setSceneRect(0,0,0,0);
 
+    //get new tree dialog data
     QMap<int,Dialog_Parameters::DialogData> checkedNodes = d_newTree->getDialogData();
-    QList<int> priorities = checkedNodes.keys();
-
+    QList<int> priorities = checkedNodes.uniqueKeys();
+    qSort(priorities.begin(),priorities.end());
     QList<AugmentationNode*> currentNodes, nextNodes;
     nextNodes << tree.getRoot();
 
-    for(int priority = 0; priority < 1; priority ++){
+    //construct tree layers
+    foreach(int priority, priorities){
+
         currentNodes = nextNodes;
         nextNodes.clear();
 
-
         QList<Dialog_Parameters::DialogData> camada = checkedNodes.values(priority);
 
+        //check for error
         if(camada.size() < d_newTree->layers.at(camada.first().layerIndex).hMax){
-
             ui->statusBar->showMessage("Error : maximum height must be equal or less than number of selected nodes",4000);
             qDebug() << "Error : maximum height < selected nodes";
             return;
         }
 
+        //create this layer
         foreach(AugmentationNode* insertionNode, currentNodes){
-            QList<AugmentationNode*> leafChildren;
-            nextNodes.append(createBrothers(insertionNode, camada));
+
+            createBrothers(insertionNode, camada,nextNodes);
         }
     }
 
@@ -149,20 +147,18 @@ void MainWindow::apply_newTree()
     scene->create(tree);
 }
 
+//save a new tree
 void MainWindow::on_saveTreeButton_clicked()
 {
-
     QString file = QFileDialog::getSaveFileName(this,tr("Save Tree"),QDir::homePath(),tr("Augmentation Tree (*.bmt)"));
     tree.save(file);
-
 }
 
+//load a new tree
 void MainWindow::on_loadTreeButton_clicked()
 {
-
     tree.clear();
     QString file = QFileDialog::getOpenFileName(this,tr("Save Tree"),QDir::homePath(),tr("Augmentation Tree (*.bmt, *.xml)"));
     tree.load(file);
     scene->create(tree);
-
 }

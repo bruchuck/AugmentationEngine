@@ -24,7 +24,6 @@ public:
     explicit DialogNewTree(QWidget *parent = 0);
     ~DialogNewTree();
 
-
     QMap<int, Dialog_Parameters::DialogData> getDialogData();
     QList<LayerData> layers;
 
@@ -32,6 +31,7 @@ public:
 private:
 
 
+    void createNewLayerUI();
     void createDialogDataInterface();
     QMap<QString, Dialog_Parameters::DialogData> dialogDataMap;
 
@@ -40,6 +40,15 @@ private slots:
     void changeParameters_clicked();
     void setNodeParameters();
     void spinBoxChanged(int value);
+    void layerChanged(int value);
+
+    void on_newLayerButton_clicked();
+
+    void on_resizeBox_clicked();
+
+    void on_resizeXBox_valueChanged(int arg1);
+
+    void on_resizeYBOX_valueChanged(int arg1);
 
 private:
     Ui::DialogNewTree *ui;

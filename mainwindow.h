@@ -49,7 +49,7 @@ private slots:
     void on_loadTreeButton_clicked();
 
 private:
-    QList<AugmentationNode*> createBrothers(AugmentationNode *node, QList<Dialog_Parameters::DialogData> nodeTypes);
+    void createBrothers(AugmentationNode *node, QList<Dialog_Parameters::DialogData> nodeTypes, QList<AugmentationNode*> &leafNodes);
     Ui::MainWindow *ui;
     GraphicsScene *scene;
 

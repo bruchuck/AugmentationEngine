@@ -19,7 +19,6 @@ void FlipImage::run()
         }
 
         flip(*inputData,*outputData,1);
-
     }
 }
 

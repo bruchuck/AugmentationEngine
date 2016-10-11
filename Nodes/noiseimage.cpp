@@ -34,8 +34,8 @@ QList<AugmentationNode::Parameter> NoiseImage::parametersInterface()
     Parameter stdDeviation;
     stdDeviation.name = "stdDeviation";
     stdDeviation.type = AugmentationNode::PARAMETER_UNIFORM;
-    stdDeviation.min = 25;
-    stdDeviation.max = 100;
+    stdDeviation.min = 10;
+    stdDeviation.max = 25;
     stdDeviation.value = 0;
     stdDeviation.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
     parameters << stdDeviation;

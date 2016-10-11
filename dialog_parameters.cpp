@@ -24,7 +24,6 @@ void Dialog_Parameters::addParameter(AugmentationNode::Parameter p)
         QDoubleSpinBox* spinBox = ui->mainLayout->itemAtPosition(ui->mainLayout->rowCount()-1,2)->widget()->findChild<QDoubleSpinBox*>();
 
         if(p.type == AugmentationNode::PARAMETER_UNIFORM){
-            qDebug() << "aqui  " << p.min;
             spinBox->setValue(p.min);
             QDoubleSpinBox* spinBox2 =ui->mainLayout->itemAtPosition(ui->mainLayout->rowCount()-1,3)->widget()->findChild<QDoubleSpinBox*>();
             spinBox2->setValue(p.max);

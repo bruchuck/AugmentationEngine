@@ -14,12 +14,9 @@ void BrightnessImage::run()
 
     if(inputData){
 
-
         updateParameters();
 
         if(parametersList.contains("brightness")){
-
-            qDebug() << "value of" << parametersList["brightness"].value.toDouble();
             inputData->convertTo(*outputData,-1,1.0,parametersList["brightness"].value.toDouble());
         }
     }
@@ -32,8 +29,8 @@ QList<AugmentationNode::Parameter> BrightnessImage::parametersInterface()
      Parameter brightness;
      brightness.name = "brightness";
      brightness.type = AugmentationNode::PARAMETER_UNIFORM;
-     brightness.min = -25;
-     brightness.max = 25;
+     brightness.min = -10;
+     brightness.max = 10;
      brightness.value = 0;
      brightness.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
      parameters << brightness;

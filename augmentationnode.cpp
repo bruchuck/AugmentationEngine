@@ -13,6 +13,11 @@ AugmentationNode::AugmentationNode()
     height = 0;
     brothers = 0;
 
+    QList<Parameter> params = parametersInterface();
+    foreach(Parameter p, params){
+        setParameter(p);
+    }
+
 }
 
 AugmentationNode::~AugmentationNode()
@@ -22,22 +27,62 @@ AugmentationNode::~AugmentationNode()
 
 void AugmentationNode::run()
 {
-    qDebug() << "running node";
-    outputData = inputData;
+
+    updateParameters();
+
+    qDebug() << parametersList["enableScale"].value.toInt() << parametersList["xRes"].value.toInt() << parametersList["yRes"].value.toInt();
+    if( parametersList["enableScale"].value.toInt() == 1){
+        int xRes = parametersList["xRes"].value.toInt();
+        int yRes = parametersList["yRes"].value.toInt();
+        float scalex = (float)inputData->rows/(float)xRes;
+        float scaley = (float)inputData->cols/(float)yRes;
+        outputData = new Mat();
+        resize(*inputData,*outputData,Size(),1.0f/scalex,1.0f/scaley);
+    }else{
+        outputData = inputData;
+    }
 }
 
 //exposed parameters to the interface
 QList<AugmentationNode::Parameter> AugmentationNode::parametersInterface()
 {
 
-    return QList<AugmentationNode::Parameter>();
+    QList<Parameter> parameters;
+
+    Parameter enableScale;
+    enableScale.name = "enableScale";
+    enableScale.type = AugmentationNode::PARAMETER_FIXED;
+    enableScale.min = 0;
+    enableScale.max = 1;
+    enableScale.value = 1;
+    enableScale.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
+
+    Parameter xres;
+    xres.name = "xRes";
+    xres.type = AugmentationNode::PARAMETER_FIXED;
+    xres.min = 1;
+    xres.max = 5000;
+    xres.value = 256;
+    xres.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
+
+    Parameter yres;
+    yres.name = "yRes";
+    yres.type = AugmentationNode::PARAMETER_FIXED;
+    yres.min = 1;
+    yres.max = 5000;
+    yres.value = 256;
+    yres.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
+
+    parameters << enableScale << xres << yres;
+
+    return parameters;
 }
 
 
 void AugmentationNode::saveOutputData(inputType data, QDir path)
 {
 
-    QString saveURL = QDir::cleanPath(path.absoluteFilePath(data.name))+ "_"+ name+QString::number(index) + ".png";
+    QString saveURL = QDir::cleanPath(path.absoluteFilePath(data.name))+ "_"+ name+QString::number(index) + ".jpg";
     saveURL.replace(" ", "_");
 
     if(!path.exists())
@@ -51,17 +96,12 @@ void AugmentationNode::saveOutputData(inputType data, QDir path)
            return;
 
     QTextStream out(&file);
-
     out << saveURL << " " << data.classification << "\n";
-
     file.close();
 }
 
 void AugmentationNode::clean()
 {
-
-    qDebug() << "cleaning node" << name << index;
-
 
     if(inputData){
         delete(inputData);

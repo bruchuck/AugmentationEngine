@@ -171,9 +171,11 @@ void AugmentationTree::execute()
     QString savePlace = "./results/";
     QList<node> nodes = getNodes();
     logger->startLog();
+    int cont = 1, total = inputList.size();
 
     foreach(inputType entry, inputList){
 
+        qDebug() << "Running image |" << cont << "| of |" << total << "|  : "<< entry.name;
         QList<AugmentationNode*> stack;
         Mat* data = loadimage(entry);
         map[root]->setInputData(data);
@@ -201,6 +203,7 @@ void AugmentationTree::execute()
         for(int i =0; i< stack.size() ; i++){
             stack[i]->deallocateOutput();
         }
+        cont++;
     }
 
     logger->closeLog();

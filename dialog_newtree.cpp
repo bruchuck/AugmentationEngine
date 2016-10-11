@@ -11,6 +11,7 @@ DialogNewTree::DialogNewTree(QWidget *parent) :
     QList<QComboBox *> comboList = this->findChildren<QComboBox*>();
     foreach(QComboBox * combo, comboList){
         combo->addItem("Layer 0",0);
+        connect(combo,SIGNAL(currentIndexChanged(int)),this,SLOT(layerChanged(int)));
     }
 
     createDialogDataInterface();
@@ -45,22 +46,38 @@ QMap<int, Dialog_Parameters::DialogData> DialogNewTree::getDialogData()
 {
     QMap<int, Dialog_Parameters::DialogData> checkedNodes;
 
-    QList<QCheckBox *> list = this->findChildren<QCheckBox*>();
+
+    QList<QCheckBox *> list = ui->ImageGroup->findChildren<QCheckBox*>();
     if(!list.isEmpty()){
-
         foreach(QCheckBox *box, list){
-
             if(box->isChecked()){
-
                 Dialog_Parameters::DialogData data = dialogDataMap[box->text()];
-
-                qDebug() << data.nodeName << "param " << data.parameters.size();
                 checkedNodes.insertMulti(data.layerIndex,data);
             }
         }
     }
 
     return checkedNodes;
+}
+
+//create GUI for a new Layer
+void DialogNewTree::createNewLayerUI()
+{
+        int row = ui->layerLayout->rowCount();
+        QSpinBox *box = new QSpinBox();
+        box->setReadOnly(true);
+        box->setButtonSymbols(QSpinBox::NoButtons);
+        box->setMaximumWidth(60);
+        box->setValue(row-1);
+        ui->layerLayout->addWidget(box,row,0);
+
+        for(int i = 1; i< 5; i++){
+            box = new QSpinBox();
+            box->setMaximumWidth(60);
+            box->setValue(1);
+            ui->layerLayout->addWidget(box,row,i);
+            connect(box,SIGNAL(valueChanged(int)),this,SLOT(spinBoxChanged(int)));
+        }
 }
 
 //create the DialogData and interface for each node type
@@ -72,7 +89,10 @@ void DialogNewTree::createDialogDataInterface()
 
         foreach(QCheckBox *box, list){
 
+
+
             QGridLayout* gridLayout = box->parentWidget()->findChild<QGridLayout*>();
+
             int row, col, row_s, col_s;
             gridLayout->getItemPosition(gridLayout->indexOf(box),&row,&col,&row_s,&col_s);
 
@@ -81,6 +101,9 @@ void DialogNewTree::createDialogDataInterface()
 
             //get configure parameters button
             QPushButton *configParam = qobject_cast<QPushButton *>(gridLayout->itemAtPosition(row,2)->widget());
+            if(!configParam)
+                return;
+
             connect(configParam,SIGNAL(pressed()),this,SLOT(changeParameters_clicked()));
 
             Dialog_Parameters::DialogData nodeData;
@@ -142,7 +165,6 @@ void DialogNewTree::setNodeParameters()
     QString nodeName = nodeParameters->windowTitle();
     nodeName.chop(11);
 
-    qDebug() << nodeName;
     if(dialogDataMap.contains(nodeName)){
         dialogDataMap[nodeName].parameters = nodeParameters->getParameters();
     }else
@@ -164,6 +186,8 @@ void DialogNewTree::spinBoxChanged(int value)
 
         switch(col){
 
+        case 0:
+            break;
         case 1:
             layers[row-1].hMin = value;
             break;
@@ -181,9 +205,78 @@ void DialogNewTree::spinBoxChanged(int value)
             min->setMaximum(value);
             break;
         default:
-            qDebug() << "SpinBox Code not implemented";
+            qDebug() << "UI SpinBox Code not implemented";
         }
-
     }
+}
+
+//update the layer for current trnasformation
+void DialogNewTree::layerChanged(int value)
+{
+
+    QComboBox *combo = qobject_cast<QComboBox*>(sender());
+
+    int row, col, rspan, cspan;
+    ui->imageLayout->getItemPosition(ui->imageLayout->indexOf(combo),&row,&col,&rspan,&cspan);
+    QCheckBox* item = qobject_cast<QCheckBox*>(ui->imageLayout->itemAtPosition(row,col-1)->widget());
+
+    dialogDataMap[item->text()].layerIndex = value;
+
+}
+
+void DialogNewTree::on_newLayerButton_clicked()
+{
+
+    createNewLayerUI();
+    //create default LayerData
+
+    LayerData lastLayer = layers.last();
+
+    LayerData newLayer;
+
+    newLayer.priority = lastLayer.priority + 1;
+    newLayer.hMin = qobject_cast<QSpinBox *>(ui->layerLayout->itemAtPosition(ui->layerLayout->rowCount()-1,1)->widget())->value();
+
+    newLayer.hMax = qobject_cast<QSpinBox *>(ui->layerLayout->itemAtPosition(ui->layerLayout->rowCount()-1,2)->widget())->value();
+    newLayer.brothersMin = qobject_cast<QSpinBox *>(ui->layerLayout->itemAtPosition(ui->layerLayout->rowCount()-1,3)->widget())->value();
+    newLayer.brothersMax = qobject_cast<QSpinBox *>(ui->layerLayout->itemAtPosition(ui->layerLayout->rowCount()-1,4)->widget())->value();
+    layers << newLayer;
+
+    QList<QComboBox *> comboList = this->findChildren<QComboBox*>();
+    foreach(QComboBox * combo, comboList){
+        combo->addItem("Layer " + QString::number(newLayer.priority), newLayer.priority);
+    }
+
+}
+
+
+
+void DialogNewTree::on_resizeBox_clicked()
+{
+
+    Dialog_Parameters *rootParams;
+
+    Dialog_Parameters::DialogData data;
+    data.nodeName = "Root";
+    data.layerIndex = -1;
+
+    QList<AugmentationNode::Parameter> params = AugmentationNode::parametersInterface();
+
+    foreach(AugmentationNode::Parameter p, params){
+        data.parameters << p;
+    }
+
+    //dialogDataMap.insert("Root",data);
+
+    qDebug() << "enabled resize";
+}
+
+void DialogNewTree::on_resizeXBox_valueChanged(int arg1)
+{
+
+}
+
+void DialogNewTree::on_resizeYBOX_valueChanged(int arg1)
+{
 
 }

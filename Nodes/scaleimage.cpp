@@ -30,7 +30,6 @@ QList<AugmentationNode::Parameter> ScaleImage::parametersInterface()
 
     QList<AugmentationNode::Parameter> parameters;
 
-
     Parameter scale;
     scale.name = "Scale";
     scale.type = AugmentationNode::PARAMETER_FIXED;

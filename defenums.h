@@ -6,7 +6,7 @@
 #include <QVariant>
 #include <opencv2/core/core.hpp>
 
-#define GRAPHICWIDTH 70.0
+#define GRAPHICWIDTH 50.0
 
 struct inputType{
   QString name, classification;
