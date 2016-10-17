@@ -85,7 +85,7 @@ Size AffineRotation::largest_rotated_rect(int h, int w, double angle)
     double y = a * cos(gamma);
     double x = y * tan(gamma);
 
-    return cv::Size(bb_w - 2 * x, bb_h - 2 * y);
+    return Size(bb_w - 2 * x, bb_h - 2 * y);
 }
 
 

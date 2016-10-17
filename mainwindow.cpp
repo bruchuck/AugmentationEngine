@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <QDebug>
 
 using namespace ogdf;
 
@@ -8,10 +8,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
+
+
     cvrand.state = cv::getTickCount();
     ui->setupUi(this);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
     ui->graphicsView->setRenderHint(QPainter::SmoothPixmapTransform);
+
 
 
 

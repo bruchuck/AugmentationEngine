@@ -74,7 +74,10 @@ win32:DEPENDPATH += C:/opencv/build/include
 unix:DEPENDPATH += /usr/include/opencv
 
 win32:CONFIG(release, debug|release): LIBS += -LC:\OGDF\x64\Release -logdf
-else:win32:CONFIG(debug, debug|release): LIBS += -LC:\OGDF\x64\Release -logdf
+else:win32:CONFIG(debug, debug|release){
+LIBS += -LC:\OGDF\x64\Release -logdf
+DEFINES += OGDF_DEBUG;
+}
 unix:CONFIG(release, debug|release): LIBS += -L/home/badmarques/libs/OGDF/_release -lOGDF -lCOIN -pthread
 
 
