@@ -129,6 +129,9 @@ void Dialog_Parameters::doubleSpinBox_changed(double value)
 
     int row, col, row_s, col_s;
     //ui->mainLayout>getItemPosition(ui->mainLayout->indexOf(spinBox),&row,&col,&row_s,&col_s);
+    //ui->mainLayout->itemAtPosition(row,col-1)->widget();
+
+    //TO DO - Set Parameter map
 
 
 }

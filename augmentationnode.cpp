@@ -34,10 +34,8 @@ void AugmentationNode::run()
     if( parametersList["enableScale"].value.toInt() == 1){
         int xRes = parametersList["xRes"].value.toInt();
         int yRes = parametersList["yRes"].value.toInt();
-        float scalex = (float)inputData->rows/(float)xRes;
-        float scaley = (float)inputData->cols/(float)yRes;
-        outputData = new Mat();
-        resize(*inputData,*outputData,Size(),1.0f/scalex,1.0f/scaley);
+        outputData = new Mat(xRes,yRes,inputData->type());
+        resize(*inputData,*outputData,outputData->size(),0,0);
     }else{
         outputData = inputData;
     }

@@ -44,6 +44,8 @@ QList<AugmentationNode::Parameter> AugmentationTree::getParametersInterface(QStr
         return ContrastImage::parametersInterface();
     }else if(nodeName == "PCA"){
         return WarpImage::parametersInterface();
+    }else if(nodeName == "CastColor"){
+        return CastColor::parametersInterface();
     }else{
 
         qDebug() << "error, getParametersInterface not implemented for Node type " << nodeName;
@@ -77,6 +79,8 @@ AugmentationNode *AugmentationTree::instantiateNode(QString name)
         return new ContrastImage();
     }else if(name == "PCA"){
         return NULL;
+    }else if(name == "CastColor"){
+        return new CastColor();
     }else{
         qDebug() << "error, no instantiation rule for node of name : " << name;
     }
@@ -108,8 +112,13 @@ void AugmentationTree::loadImageList(QString name, QString appendURL)
 
         if(entry.path.canonicalPath() == ""){
             //qDebug() << "Wrong file path, do you want to append ?";
+
+            if(!(appendURL[appendURL.length()-1] == QChar('\\') || appendURL[appendURL.length()-1] == QChar('/'))){
+
+                appendURL.append('/');
+            }
+
             entry.path= QDir(filePath.prepend(appendURL));
-            //qDebug() << entry.path;
 
         }
 
@@ -340,8 +349,7 @@ void AugmentationTree::load(QString fileName)
     loadFile.open(QFile::ReadOnly);
 
     QXmlStreamReader reader(&loadFile);
-
-    QList<AugmentationNode*> nodes;
+    QMap<int, AugmentationNode*> nodeMap;
 
     while (!reader.atEnd()) {
 
@@ -351,9 +359,13 @@ void AugmentationTree::load(QString fileName)
 
         if(reader.name() == "Node"){
 
+
+            int currentIndex = reader.attributes()[0].value().toInt();
+
             reader.readNextStartElement();
             QString name = reader.readElementText();
             AugmentationNode *node = instantiateNode(name);
+            node->setIndex(currentIndex);
             reader.readNextStartElement();
 
             qDebug() << reader.name();
@@ -395,21 +407,25 @@ void AugmentationTree::load(QString fileName)
                 reader.readNextStartElement();
             }
 
-            nodes << node;
+            nodeMap.insert(node->getIndex(),node);
         }
         else if(reader.name() =="Edge"){
 
             int source = reader.attributes().first().value().toInt();
             int target = reader.attributes().at(1).value().toInt();
-            addNode(nodes[source],nodes[target]);
+            addNode(nodeMap[source],nodeMap[target]);
 
             reader.readNextStartElement();
         }
 
     }
+
+
     if (reader.hasError()) {
         qDebug() << reader.errorString();
       }
+    qDebug() << "Done";
+
 
     loadFile.close();
 }

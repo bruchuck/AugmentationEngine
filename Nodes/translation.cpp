@@ -25,6 +25,29 @@ void Translation::run()
 
         warpAffine(*inputData,*outputData,transform,inputData->size());
 
+
+        int x1,x2, y1, y2;
+        if(tx> 0){
+            x1 = 0 + tx;
+            x2 = outputData->rows-1;
+        }else{
+            x1 = 0;
+            x2 = outputData->rows -1 +tx;
+        }
+
+        if(ty > 0){
+            y1 = 0 + ty;
+            y2 = outputData->cols-1;
+        }else{
+            y1 = 0;
+            y2 = outputData->cols-1 +ty;
+        }
+
+
+        Rect cropWindow(Point(x1,y1),Point(x2,y2));
+        Mat image(*outputData);
+        *outputData = image(cropWindow);
+
     }
 }
 

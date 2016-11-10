@@ -34,18 +34,18 @@ QList<AugmentationNode::Parameter> BlurImage::parametersInterface()
     Parameter kernelSize;
     kernelSize.name = "KernelSize";
     kernelSize.type = AugmentationNode::PARAMETER_UNIFORM;
-    kernelSize.min = 9;
-    kernelSize.max = 31;
-    kernelSize.value = 5;
+    kernelSize.min = 3;
+    kernelSize.max = 5;
+    kernelSize.value = 3;
     kernelSize.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
     parameters << kernelSize;
 
     Parameter sigma;
     sigma.name = "Sigma";
     sigma.type = AugmentationNode::PARAMETER_UNIFORM;
-    sigma.min = 0.85;
-    sigma.max = 0.95;
-    sigma.value = 0.95;
+    sigma.min = 0.8;
+    sigma.max = 1.0;
+    sigma.value = 1.0;
     sigma.widgetClassName = QDoubleSpinBox::staticMetaObject.className();
     parameters << sigma;
 

@@ -13,6 +13,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <defenums.h>
 #include <QVariant>
+#include <QDoubleSpinBox>
 
 
 using namespace cv;

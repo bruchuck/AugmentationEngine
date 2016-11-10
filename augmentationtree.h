@@ -17,6 +17,7 @@
 #include "Nodes/contrastimage.h"
 #include "Nodes/noiseimage.h"
 #include "Nodes/warpimage.h"
+#include "Nodes/castcolor.h"
 
 
 #include <QXmlStreamWriter>

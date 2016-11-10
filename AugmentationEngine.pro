@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     Nodes/noiseimage.cpp \
     Nodes/warpimage.cpp \
     Nodes/brightnessimage.cpp \
-    Nodes/contrastimage.cpp
+    Nodes/contrastimage.cpp \
+    Nodes/castcolor.cpp
 
 HEADERS  += mainwindow.h \
     Graphics/graphicsscene.h \
@@ -50,42 +51,39 @@ HEADERS  += mainwindow.h \
     Nodes/noiseimage.h \
     Nodes/warpimage.h \
     Nodes/brightnessimage.h \
-    Nodes/contrastimage.h
+    Nodes/contrastimage.h \
+    Nodes/castcolor.h
 
 FORMS    += mainwindow.ui \
     dialog_newtree.ui \
     dialog_parameters.ui
 
-#win32:CONFIG(release, debug|release): LIBS += -L$$(OPENCV_DIR)/lib/ -lopencv_world310
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$(OPENCV_DIR)/lib/ -lopencv_world310d
+#OpenCV
 win32:CONFIG(release, debug|release): LIBS += -LC:/opencv/build/x64/vc14/lib -lopencv_world310
 else:win32:CONFIG(debug, debug|release): LIBS += -LC:/opencv/build/x64/vc14/lib -lopencv_world310d
 
-unix:CONFIG(release, debug|release): LIBS += -L/usr/lib/x86_64-linux-gnu -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab
+#unix:CONFIG(release, debug|release): LIBS += -L/usr/lib/x86_64-linux-gnu -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab
 
-#unix:CONFIG(release, debug|release): LIBS += 'pkg-config --cflags --libs opencv'
-
+unix: LIBS += -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab
 
 win32:INCLUDEPATH += C:/opencv/build/include
-#unix:INCLUDEPATH +=/home/badmarques/aug/AugmentationEngine/opencv/release/include
 unix:INCLUDEPATH +=/usr/include
 win32:DEPENDPATH += C:/opencv/build/include
-#unix:DEPENDPATH +=/home/badmarques/aug/AugmentationEngine/opencv/release/include
 unix:DEPENDPATH += /usr/include/opencv
 
+#OGDF
 win32:CONFIG(release, debug|release): LIBS += -LC:\OGDF\x64\Release -logdf
 else:win32:CONFIG(debug, debug|release){
-LIBS += -LC:\OGDF\x64\Release -logdf
+LIBS += -LC:\OGDF\x64\Debug -logdf
 DEFINES += OGDF_DEBUG;
 }
-unix:CONFIG(release, debug|release): LIBS += -L/home/badmarques/libs/OGDF/_release -lOGDF -lCOIN -pthread
-
+#unix:CONFIG(release, debug|release): LIBS += -L/home/badmarques/libs/OGDF/_release -lOGDF -lCOIN -pthread
+#unix:CONFIG(release, debug|release): LIBS += -lOGDF -lCOIN -pthread
+unix: LIBS += -lOGDF -lCOIN -pthread
 
 
 win32:INCLUDEPATH += C:/OGDF/include
-unix:INCLUDEPATH +=/home/badmarques/libs/OGDF/include
+#unix:INCLUDEPATH +=/home/badmarques/libs/OGDF/include
 
 win32:DEPENDPATH += C:/OGDF/include
-unix:DEPENDPATH +=/home/badmarques/libs/OGDF/include
-
-
+#unix:DEPENDPATH +=/home/badmarques/libs/OGDF/include

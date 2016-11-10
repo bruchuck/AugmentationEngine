@@ -9,15 +9,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
 
-
-
     cvrand.state = cv::getTickCount();
     ui->setupUi(this);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
     ui->graphicsView->setRenderHint(QPainter::SmoothPixmapTransform);
-
-
-
 
     d_newTree = new DialogNewTree(this);
 
@@ -33,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent) :
     tree.save("test");
 
     //tree.loadImageList("inputFile.txt");
+
+    ui->apendText->setText(QDir::homePath());
 
 }
 
@@ -154,7 +151,7 @@ void MainWindow::apply_newTree()
 //save a new tree
 void MainWindow::on_saveTreeButton_clicked()
 {
-    QString file = QFileDialog::getSaveFileName(this,tr("Save Tree"),QDir::homePath(),tr("Augmentation Tree (*.bmt)"));
+    QString file = QFileDialog::getSaveFileName(this,tr("Save Tree"),QDir::homePath(),tr("Augmentation Tree (*.bmt *.xml)"));
     tree.save(file);
 }
 
@@ -162,7 +159,7 @@ void MainWindow::on_saveTreeButton_clicked()
 void MainWindow::on_loadTreeButton_clicked()
 {
     tree.clear();
-    QString file = QFileDialog::getOpenFileName(this,tr("Save Tree"),QDir::homePath(),tr("Augmentation Tree (*.bmt, *.xml)"));
+    QString file = QFileDialog::getOpenFileName(this,tr("Load Tree"),QDir::homePath(),tr("Augmentation Tree (*.bmt *.xml)"));
     tree.load(file);
     scene->create(tree);
 }
